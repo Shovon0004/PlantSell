@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlantB REST API - Endpoint Directory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0f0d;
+      --card-bg: #111a16;
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border: #1f2f28;
+      
+      --color-get: #10b981;
+      --color-post: #3b82f6;
+      --color-put: #f59e0b;
+      --color-delete: #ef4444;
+      
+      --bg-get: rgba(16, 185, 129, 0.1);
+      --bg-post: rgba(59, 130, 246, 0.1);
+      --bg-put: rgba(245, 158, 11, 0.1);
+      --bg-delete: rgba(239, 68, 68, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      line-height: 1.5;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .search-filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 250px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--text-muted);
+      color: var(--text-main);
+    }
+
+    .tab-btn.active {
+      background: var(--accent);
+      color: #000;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .endpoint-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.25rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .endpoint-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .method-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .method-GET { color: var(--color-get); background: var(--bg-get); border: 1px solid rgba(16,185,129,0.3); }
+    .method-POST { color: var(--color-post); background: var(--bg-post); border: 1px solid rgba(59,130,246,0.3); }
+    .method-PUT { color: var(--color-put); background: var(--bg-put); border: 1px solid rgba(245,158,11,0.3); }
+    .method-DELETE { color: var(--color-delete); background: var(--bg-delete); border: 1px solid rgba(239,68,68,0.3); }
+
+    .path-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      color: #fff;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    .copy-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+
+    .description {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .auth-badge {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .admin-badge {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .meta-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .meta-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .code-block {
+      background: #060a08;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #34d399;
+      position: relative;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .code-block .copy-code-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .code-block:hover .copy-code-btn {
+      opacity: 1;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--accent);
+      color: #000;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div>
+      <h1>PlantB REST API <span>Directory</span></h1>
+      <div class="subtitle">Quick reference endpoint library to copy paths and payloads directly to Postman. Base URL: <code>http://127.0.0.1:5000</code></div>
+    </div>
+  </header>
+
+  <div class="search-filter-bar">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search endpoint path, method, description...">
+    <div class="tabs" id="tabsContainer">
+      <button class="tab-btn active" onclick="filterCategory('all')">All</button>
+      <button class="tab-btn" onclick="filterCategory('auth')">Auth</button>
+      <button class="tab-btn" onclick="filterCategory('catalog')">Catalog</button>
+      <button class="tab-btn" onclick="filterCategory('cart')">Cart & Wishlist</button>
+      <button class="tab-btn" onclick="filterCategory('orders')">Orders</button>
+      <button class="tab-btn" onclick="filterCategory('profile')">Profile</button>
+      <button class="tab-btn" onclick="filterCategory('admin')">Admin</button>
+    </div>
+  </div>
+
+  <div id="endpointsList"></div>
+</div>
+
+<div class="toast" id="copyToast">Copied to clipboard!</div>
+
+<script>
+  const endpoints = [
+    {
+      category: 'auth',
+      method: 'POST',
+      path: '/api/auth/register',
+      desc: 'Register a new customer account',
+      auth: false,
+      admin: false,
+      body: {
+        name: "Jane Doe",
+        email: "jane@example.com",
+        password: "password123"
+      }
+    },
+    {
+      category: 'auth',
+      method: 'POST',
+      path: '/api/auth/login',
+      desc: 'Authenticates user credentials and outputs Access Token (15m) and Refresh Token (7d)',
+      auth: false,
+      admin: false,
+      body: {
+        email: "jane@example.com",
+        password: "password123"
+      }
+    },
+    {
+      category: 'auth',
+      method: 'POST',
+      path: '/api/auth/refresh',
+      desc: 'Generates a new short-lived access token using a valid Refresh Token',
+      auth: false,
+      admin: false,
+      body: {
+        refreshToken: "eyJhbGciOiJIUzI1NiIsInR..."
+      }
+    },
+    {
+      category: 'auth',
+      method: 'POST',
+      path: '/api/auth/logout',
+      desc: 'Logs out user and invalidates/deletes refresh token session from DB',
+      auth: false,
+      admin: false,
+      body: {
+        refreshToken: "eyJhbGciOiJIUzI1NiIsInR..."
+      }
+    },
+    {
+      category: 'catalog',
+      method: 'GET',
+      path: '/api/categories',
+      desc: 'Retrieves all available categories and subcategories',
+      auth: false,
+      admin: false
+    },
+    {
+      category: 'catalog',
+      method: 'GET',
+      path: '/api/products',
+      desc: 'Get products. Supports filtering by category, type (subcategory), minPrice/maxPrice, rating, page, limit, and sortBy (price:asc, price:desc, rating:desc, createdAt:desc)',
+      auth: false,
+      admin: false
+    },
+    {
+      category: 'catalog',
+      method: 'GET',
+      path: '/api/products/search?q=Monstera',
+      desc: 'Performs Mongo Text Index Search on product names, tags and descriptions',
+      auth: false,
+      admin: false
+    },
+    {
+      category: 'catalog',
+      method: 'GET',
+      path: '/api/products/featured',
+      desc: 'Retrieves all products marked as featured (isFeatured: true)',
+      auth: false,
+      admin: false
+    },
+    {
+      category: 'catalog',
+      method: 'GET',
+      path: '/api/products/:productId',
+      desc: 'Get detailed product information, including reviews',
+      auth: false,
+      admin: false
+    },
+    {
+      category: 'catalog',
+      method: 'POST',
+      path: '/api/products/:productId/reviews',
+      desc: 'Submit a product rating and review. Automatically recalculates product rating average.',
+      auth: true,
+      admin: false,
+      body: {
+        rating: 5,
+        comment: "Beautiful plant, arrived in healthy packaging!"
+      }
+    },
+    {
+      category: 'cart',
+      method: 'GET',
+      path: '/api/cart',
+      desc: 'Fetch current logged in user\'s cart details',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'cart',
+      method: 'POST',
+      path: '/api/cart',
+      desc: 'Add product or update quantities in the shopping cart',
+      auth: true,
+      admin: false,
+      body: {
+        productId: "66597dc83ef...",
+        quantity: 2
+      }
+    },
+    {
+      category: 'cart',
+      method: 'PUT',
+      path: '/api/cart/:cartItemId',
+      desc: 'Update quantity of an item directly in the shopping cart',
+      auth: true,
+      admin: false,
+      body: {
+        quantity: 5
+      }
+    },
+    {
+      category: 'cart',
+      method: 'DELETE',
+      path: '/api/cart/:cartItemId',
+      desc: 'Remove an item from the shopping cart',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'cart',
+      method: 'POST',
+      path: '/api/wishlist/:productId',
+      desc: 'Toggle product inclusion in wishlist (adds if not present, removes if present)',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'cart',
+      method: 'GET',
+      path: '/api/wishlist',
+      desc: 'Retrieve current user\'s wishlist contents',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'orders',
+      method: 'POST',
+      path: '/api/orders',
+      desc: 'Checkout/Place order. Deducts stock quantity and clears the shopping cart.',
+      auth: true,
+      admin: false,
+      body: {
+        items: [
+          {
+            product: "66597dc83ef...",
+            quantity: 2
+          }
+        ],
+        shippingAddress: {
+          street: "123 Green Lane",
+          city: "Foliage Ville",
+          state: "NY",
+          zipCode: "10001",
+          country: "USA"
+        },
+        paymentMethod: "cod"
+      }
+    },
+    {
+      category: 'orders',
+      method: 'GET',
+      path: '/api/orders/my-orders',
+      desc: 'Retrieve logged-in customer\'s order history',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'orders',
+      method: 'GET',
+      path: '/api/orders/:orderId',
+      desc: 'Retrieve full details of a specific personal order',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'orders',
+      method: 'POST',
+      path: '/api/orders/:orderId/cancel',
+      desc: 'Cancel an order (only allowed if order status is pending or confirmed). Restores stock quantities.',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'profile',
+      method: 'GET',
+      path: '/api/profile',
+      desc: 'View personal user details and address list',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'profile',
+      method: 'PUT',
+      path: '/api/profile',
+      desc: 'Update account general details (name)',
+      auth: true,
+      admin: false,
+      body: {
+        name: "Jane Smith"
+      }
+    },
+    {
+      category: 'profile',
+      method: 'PUT',
+      path: '/api/profile/change-password',
+      desc: 'Change account password',
+      auth: true,
+      admin: false,
+      body: {
+        oldPassword: "password123",
+        newPassword: "secureNewPassword789"
+      }
+    },
+    {
+      category: 'profile',
+      method: 'POST',
+      path: '/api/profile/address',
+      desc: 'Add a new shipping address. Ensures only one default is active.',
+      auth: true,
+      admin: false,
+      body: {
+        street: "456 Oak Avenue",
+        city: "Timberland",
+        state: "CA",
+        zipCode: "95112",
+        country: "USA",
+        isDefault: true
+      }
+    },
+    {
+      category: 'profile',
+      method: 'PUT',
+      path: '/api/profile/address/:addressId',
+      desc: 'Modify an existing address details',
+      auth: true,
+      admin: false,
+      body: {
+        street: "456 Oak Avenue Apt B",
+        city: "Timberland",
+        state: "CA",
+        zipCode: "95112",
+        country: "USA",
+        isDefault: true
+      }
+    },
+    {
+      category: 'profile',
+      method: 'DELETE',
+      path: '/api/profile/address/:addressId',
+      desc: 'Delete an address from user profile',
+      auth: true,
+      admin: false
+    },
+    {
+      category: 'admin',
+      method: 'POST',
+      path: '/api/admin/products',
+      desc: 'Add new e-commerce product. Submit as Multipart Form-Data (includes file fields up to 5 images)',
+      auth: true,
+      admin: true,
+      body: {
+        name: "Monstera Variegata",
+        description: "Rare foliage plant",
+        price: 99.99,
+        stock: 5,
+        category: "plants",
+        type: "indoor",
+        tags: "rare,indoor,variegated",
+        discount: 0,
+        isFeatured: "true"
+      }
+    },
+    {
+      category: 'admin',
+      method: 'PUT',
+      path: '/api/admin/products/:productId',
+      desc: 'Update product information. Supports additional image files.',
+      auth: true,
+      admin: true,
+      body: {
+        price: 89.99,
+        stock: 12
+      }
+    },
+    {
+      category: 'admin',
+      method: 'DELETE',
+      path: '/api/admin/products/:productId',
+      desc: 'Remove product from store inventory database',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'PUT',
+      path: '/api/admin/products/:productId/stock',
+      desc: 'Change stock quantity of a specific item',
+      auth: true,
+      admin: true,
+      body: {
+        stock: 50
+      }
+    },
+    {
+      category: 'admin',
+      method: 'POST',
+      path: '/api/admin/categories',
+      desc: 'Create a new catalog category',
+      auth: true,
+      admin: true,
+      body: {
+        name: "tools",
+        description: "Watering cans, shears, shovels, etc.",
+        subcategories: ["pruning", "watering", "gardening"]
+      }
+    },
+    {
+      category: 'admin',
+      method: 'PUT',
+      path: '/api/admin/categories/:id',
+      desc: 'Update details of a category',
+      auth: true,
+      admin: true,
+      body: {
+        description: "High quality premium gardening accessories"
+      }
+    },
+    {
+      category: 'admin',
+      method: 'DELETE',
+      path: '/api/admin/categories/:id',
+      desc: 'Remove a product category',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/orders',
+      desc: 'List all customer orders. Optional query filters: status, dateFrom, dateTo',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/orders/:id',
+      desc: 'Get details of any customer order',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'PUT',
+      path: '/api/admin/orders/:id/status',
+      desc: 'Modify order status. Auto-marks payment status to paid if delivered. Restores stock if cancelled.',
+      auth: true,
+      admin: true,
+      body: {
+        status: "shipped"
+      }
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/users',
+      desc: 'View all registered customers and administrators',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/users/:id',
+      desc: 'Get full profile summary of a specific customer',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'PUT',
+      path: '/api/admin/users/:id/block',
+      desc: 'Block or unblock user accounts from signing in and interacting',
+      auth: true,
+      admin: true,
+      body: {
+        isBlocked: true
+      }
+    },
+    {
+      category: 'admin',
+      method: 'DELETE',
+      path: '/api/admin/users/:id',
+      desc: 'Permanently remove a user account from database',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/dashboard',
+      desc: 'Retrieves sales overview, customer counts, low stock alerts, and low stock list',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/analytics/top-products',
+      desc: 'Aggregation query computing top 10 best-selling items, quantity sold and revenue generated',
+      auth: true,
+      admin: true
+    },
+    {
+      category: 'admin',
+      method: 'GET',
+      path: '/api/admin/analytics/revenue?period=daily',
+      desc: 'Computes period-based sales revenue charts. Query params: period (daily, weekly, monthly)',
+      auth: true,
+      admin: true
+    }
+  ];
+
+  let currentCategory = 'all';
+
+  function filterCategory(cat) {
+    currentCategory = cat;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    renderEndpoints();
+  }
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('copyToast');
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 2000);
+    });
+  }
+
+  function renderEndpoints() {
+    const listContainer = document.getElementById('endpointsList');
+    listContainer.innerHTML = '';
+
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+    const filtered = endpoints.filter(ep => {
+      const matchesCategory = currentCategory === 'all' || ep.category === currentCategory;
+      const matchesSearch = ep.path.toLowerCase().includes(searchTerm) || 
+                            ep.method.toLowerCase().includes(searchTerm) ||
+                            ep.desc.toLowerCase().includes(searchTerm);
+      return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '<div style="text-align:center; padding: 3rem; color: var(--text-muted);">No endpoints match the filters.</div>';
+      return;
+    }
+
+    filtered.forEach(ep => {
+      const card = document.createElement('div');
+      card.className = 'endpoint-card';
+
+      let badgesHtml = '';
+      if (ep.auth) {
+        badgesHtml += `<span class="auth-badge">🔑 Auth Required</span> `;
+      }
+      if (ep.admin) {
+        badgesHtml += `<span class="admin-badge">👑 Admin Only</span>`;
+      }
+
+      let metaHtml = '';
+      if (ep.auth || ep.body) {
+        metaHtml += `<div class="meta-details">`;
+        if (ep.auth) {
+          metaHtml += `
+            <div class="meta-row">
+              <span class="meta-title">Headers</span>
+              <div class="code-block" style="color: #60a5fa;">Authorization: Bearer &lt;accessToken&gt;<button class="copy-btn copy-code-btn" onclick="copyText('Authorization: Bearer <accessToken>')">Copy</button></div>
+            </div>
+          `;
+        }
+        if (ep.body) {
+          const bodyStr = JSON.stringify(ep.body, null, 2);
+          metaHtml += `
+            <div class="meta-row">
+              <span class="meta-title">JSON Request Body</span>
+              <div class="code-block">${bodyStr}<button class="copy-btn copy-code-btn" onclick="copyText(\`${bodyStr.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">Copy Body</button></div>
+            </div>
+          `;
+        }
+        metaHtml += `</div>`;
+      }
+
+      card.innerHTML = `
+        <div class="card-header">
+          <span class="method-badge method-${ep.method}">${ep.method}</span>
+          <div class="path-container">
+            <span>${ep.path}</span>
+            <button class="copy-btn" onclick="copyText('${ep.path}')">Copy Path</button>
+          </div>
+          <div class="badges-container">${badgesHtml}</div>
+        </div>
+        <div class="description">${ep.desc}</div>
+        ${metaHtml}
+      `;
+
+      listContainer.appendChild(card);
+    });
+  }
+
+  document.getElementById('searchInput').addEventListener('input', renderEndpoints);
+  
+  // Initial render
+  renderEndpoints();
+</script>
+
+</body>
+</html>
