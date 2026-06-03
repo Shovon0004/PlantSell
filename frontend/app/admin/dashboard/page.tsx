@@ -125,18 +125,22 @@ export default function AdminDashboard() {
               {revenue.length === 0 ? (
                 <p style={{ color: "var(--muted)", padding: "20px", textAlign: "center" }}>No revenue data yet</p>
               ) : (
-                revenue.map((r) => (
-                  <div key={r._id} className="adm-bar-item">
-                    <div className="adm-bar-wrap">
-                      <div
-                        className="adm-bar"
-                        style={{ height: `${Math.round((r.revenue / maxRevenue) * 100)}%` }}
-                        title={`₹${r.revenue.toFixed(2)}`}
-                      />
+                revenue.map((r) => {
+                  const keyStr = typeof r._id === "object" ? `${r._id.year}-${r._id.week}` : String(r._id);
+                  const labelStr = typeof r._id === "object" ? `W${r._id.week} '${String(r._id.year).slice(-2)}` : String(r._id);
+                  return (
+                    <div key={keyStr} className="adm-bar-item">
+                      <div className="adm-bar-wrap">
+                        <div
+                          className="adm-bar"
+                          style={{ height: `${Math.round((r.revenue / maxRevenue) * 100)}%` }}
+                          title={`₹${r.revenue.toFixed(2)}`}
+                        />
+                      </div>
+                      <div className="adm-bar-label">{labelStr}</div>
                     </div>
-                    <div className="adm-bar-label">{r._id}</div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
