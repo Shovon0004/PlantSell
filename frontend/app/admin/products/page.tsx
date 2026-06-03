@@ -110,8 +110,7 @@ export default function AdminProductsPage() {
     fd.append("tags", form.tags);
     fd.append("discount", form.discount);
     fd.append("isFeatured", String(form.isFeatured));
-    // Use imageUrl as images array (backend expects file uploads, we send URL as workaround)
-    // For demo, we patch via updateProduct's JSON body
+    if (form.imageUrl) fd.append("imageUrl", form.imageUrl);
 
     try {
       if (editProduct) {

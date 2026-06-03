@@ -17,8 +17,8 @@ async function refreshAccessToken(): Promise<string | null> {
     });
     if (!res.ok) return null;
     const data = await res.json();
-    localStorage.setItem("ps_access_token", data.accessToken);
-    return data.accessToken;
+    localStorage.setItem("ps_access_token", data.data.accessToken);
+    return data.data.accessToken;
   } catch {
     return null;
   }
@@ -66,16 +66,22 @@ async function request<T>(
 // ---- AUTH ----
 export const api = {
   auth: {
-    register: (data: { name: string; email: string; password: string }) =>
-      request<{ accessToken: string; refreshToken: string; user: User }>(
-        "/auth/register",
-        { method: "POST", body: JSON.stringify(data) }
-      ),
-    login: (data: { email: string; password: string }) =>
-      request<{ accessToken: string; refreshToken: string; user: User }>(
-        "/auth/login",
-        { method: "POST", body: JSON.stringify(data) }
-      ),
+    register: async (data: { name: string; email: string; password: string }) => {
+      const res = await request<{ success: boolean; data: any }>("/auth/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const { accessToken, refreshToken, ...user } = res.data;
+      return { accessToken, refreshToken, user: user as User };
+    },
+    login: async (data: { email: string; password: string }) => {
+      const res = await request<{ success: boolean; data: any }>("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const { accessToken, refreshToken, ...user } = res.data;
+      return { accessToken, refreshToken, user: user as User };
+    },
     logout: (refreshToken: string) =>
       request("/auth/logout", {
         method: "POST",
@@ -324,9 +330,13 @@ export interface DashboardData {
 }
 
 export interface TopProduct {
-  product: Product;
-  totalSold: number;
-  revenue: number;
+  _id: string;
+  name: string;
+  category: string;
+  type: string;
+  images: string[];
+  quantitySold: number;
+  revenueGenerated: number;
 }
 
 export interface RevenueData {

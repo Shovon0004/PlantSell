@@ -26,7 +26,7 @@ export default function AdminDashboard() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
-  const [topProducts, setTopProducts] = useState<{ product: { _id: string; name: string; images: string[] }; totalSold: number; revenue: number }[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
   const [revenue, setRevenue] = useState<{ _id: string; revenue: number; orders: number }[]>([]);
   const [revenueperiod, setRevenuePeriod] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [loading, setLoading] = useState(true);
@@ -186,14 +186,14 @@ export default function AdminDashboard() {
             </div>
             <div className="adm-top-products">
               {topProducts.slice(0, 5).map((tp, i) => (
-                <div key={tp.product._id} className="adm-top-product-row">
+                <div key={tp._id} className="adm-top-product-row">
                   <span className="adm-rank">#{i + 1}</span>
-                  <img className="adm-top-img" src={imgUrl(tp.product.images?.[0])} alt={tp.product.name} />
+                  <img className="adm-top-img" src={imgUrl(tp.images?.[0])} alt={tp.name} />
                   <div className="adm-top-info">
-                    <div className="adm-top-name">{tp.product.name}</div>
-                    <div className="adm-top-sub">{tp.totalSold} sold</div>
+                    <div className="adm-top-name">{tp.name}</div>
+                    <div className="adm-top-sub">{tp.quantitySold} sold</div>
                   </div>
-                  <div className="adm-top-rev">₹{(tp.revenue || 0).toFixed(0)}</div>
+                  <div className="adm-top-rev">₹{(tp.revenueGenerated || 0).toFixed(0)}</div>
                 </div>
               ))}
               {topProducts.length === 0 && (
