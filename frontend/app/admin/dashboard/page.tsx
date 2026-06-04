@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [data, setData] = useState<DashboardData | null>(null);
   const [topProducts, setTopProducts] = useState<any[]>([]);
-  const [revenue, setRevenue] = useState<{ _id: string; revenue: number; orders: number }[]>([]);
+  const [revenue, setRevenue] = useState<any[]>([]);
   const [revenueperiod, setRevenuePeriod] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [loading, setLoading] = useState(true);
 
@@ -126,8 +126,10 @@ export default function AdminDashboard() {
                 <p style={{ color: "var(--muted)", padding: "20px", textAlign: "center" }}>No revenue data yet</p>
               ) : (
                 revenue.map((r) => {
-                  const keyStr = typeof r._id === "object" ? `${r._id.year}-${r._id.week}` : String(r._id);
-                  const labelStr = typeof r._id === "object" ? `W${r._id.week} '${String(r._id.year).slice(-2)}` : String(r._id);
+                  const idObj = r._id as any;
+                  const isObj = typeof r._id === "object" && r._id !== null;
+                  const keyStr = isObj ? `${idObj.year}-${idObj.week}` : String(r._id);
+                  const labelStr = isObj ? `W${idObj.week} '${String(idObj.year).slice(-2)}` : String(r._id);
                   return (
                     <div key={keyStr} className="adm-bar-item">
                       <div className="adm-bar-wrap">

@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/shopData";
+import { Product } from "@/lib/api";
 import ShopProductCard from "./ShopProductCard";
 
 interface ShopProductsAreaProps {
@@ -9,10 +9,10 @@ interface ShopProductsAreaProps {
   currentPage: number;
   perPage: number;
   totalCount: number;
-  addedIds: Set<number>;
-  wishedIds: Set<number>;
+  addedIds: Set<string>;
+  wishedIds: Set<string>;
   onAddToCart: (product: Product) => void;
-  onToggleWish: (id: number) => void;
+  onToggleWish: (id: string) => void;
   onPageChange: (page: number) => void;
 }
 
@@ -44,13 +44,13 @@ export default function ShopProductsArea({
         <div className={`sp-products-grid ${viewMode === "list" ? "sp-products-grid--list" : ""}`}>
           {paginated.map((product, i) => (
             <ShopProductCard
-              key={product.id}
+              key={product._id}
               product={product}
               viewMode={viewMode}
               index={i}
               onAddToCart={onAddToCart}
-              isAdded={addedIds.has(product.id)}
-              isWished={wishedIds.has(product.id)}
+              isAdded={addedIds.has(product._id)}
+              isWished={wishedIds.has(product._id)}
               onToggleWish={onToggleWish}
             />
           ))}

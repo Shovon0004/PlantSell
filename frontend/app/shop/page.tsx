@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
-import { PRODUCTS, Product } from "@/lib/shopData";
+import { Product, api } from "@/lib/api";
 import CustomCursor from "@/components/sections/CustomCursor";
 import PageEffects from "@/components/sections/PageEffects";
 import ShopPageHeader from "@/components/shop/ShopPageHeader";
@@ -44,14 +44,25 @@ export default function ShopPage() {
   const [cartItems, setCartItems] = useState<ShopCartItem[]>([]);
 
   // UI states
-  const [addedIds, setAddedIds] = useState<Set<number>>(new Set());
-  const [wishedIds, setWishedIds] = useState<Set<number>>(new Set());
+  const [addedIds, setAddedIds] = useState<Set<string>>(new Set());
+  const [wishedIds, setWishedIds] = useState<Set<string>>(new Set());
+
+  // Products from API
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.products.list().then((res) => {
+      setProducts(res.data || []);
+      setLoading(false);
+    }).catch(() => setLoading(false));
+  }, []);
 
   const cartCount = cartItems.reduce((s, x) => s + x.qty, 0);
 
   // Filtering + sorting logic
   const filteredProducts = useMemo<Product[]>(() => {
-    let items = [...PRODUCTS];
+    let items = [...products];
 
     if (activeTab !== "all") {
       items = items.filter((p) => p.type === activeTab);
@@ -63,39 +74,35 @@ export default function ShopPage() {
         (p) =>
           p.name.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q) ||
-          p.tags.some((t) => t.toLowerCase().includes(q))
+          p.tags?.some((t) => t.toLowerCase().includes(q))
       );
     }
 
     items = items.filter((p) => p.price <= filters.priceMax);
 
     if (filters.minRating > 0) {
-      items = items.filter((p) => p.rating >= filters.minRating);
+      items = items.filter((p) => (p.ratings?.average || 0) >= filters.minRating);
     }
 
     if (filters.onSale) {
-      items = items.filter((p) => p.badge === "sale");
+      items = items.filter((p) => p.discount && p.discount > 0);
     }
 
-    if (filters.sameDay) {
-      items = items.filter((p) => p.sameDay);
+    if (filters.inStock) {
+      items = items.filter((p) => p.stock > 0);
     }
 
     if (filters.categories.length > 0) {
       items = items.filter((p) => filters.categories.includes(p.category));
     }
 
-    if (filters.sizes.length > 0) {
-      items = items.filter((p) => p.size && filters.sizes.includes(p.size));
-    }
-
     // Sort
     if (sortMode === "price-asc") items.sort((a, b) => a.price - b.price);
     else if (sortMode === "price-desc") items.sort((a, b) => b.price - a.price);
-    else if (sortMode === "rating") items.sort((a, b) => b.rating - a.rating);
+    else if (sortMode === "rating") items.sort((a, b) => (b.ratings?.average || 0) - (a.ratings?.average || 0));
 
     return items;
-  }, [activeTab, searchQuery, sortMode, filters]);
+  }, [activeTab, searchQuery, sortMode, filters, products]);
 
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab);
@@ -124,26 +131,26 @@ export default function ShopPage() {
 
   const handleAddToCart = useCallback((product: Product) => {
     setCartItems((prev) => {
-      const existing = prev.find((x) => x.id === product.id);
+      const existing = prev.find((x) => x.id === product._id);
       if (existing) {
         return prev.map((x) =>
-          x.id === product.id ? { ...x, qty: x.qty + 1 } : x
+          x.id === product._id ? { ...x, qty: x.qty + 1 } : x
         );
       }
       return [...prev, productToCartItem(product)];
     });
 
-    setAddedIds((prev) => new Set(prev).add(product.id));
+    setAddedIds((prev) => new Set(prev).add(product._id));
     setTimeout(() => {
       setAddedIds((prev) => {
         const next = new Set(prev);
-        next.delete(product.id);
+        next.delete(product._id);
         return next;
       });
     }, 1500);
   }, []);
 
-  const handleToggleWish = useCallback((id: number) => {
+  const handleToggleWish = useCallback((id: string) => {
     setWishedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -152,7 +159,7 @@ export default function ShopPage() {
     });
   }, []);
 
-  const handleQtyChange = useCallback((id: number, delta: number) => {
+  const handleQtyChange = useCallback((id: string, delta: number) => {
     setCartItems((prev) =>
       prev
         .map((x) => (x.id === id ? { ...x, qty: x.qty + delta } : x))

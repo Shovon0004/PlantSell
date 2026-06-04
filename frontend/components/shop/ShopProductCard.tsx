@@ -1,6 +1,6 @@
 "use client";
 
-import { Product } from "@/lib/shopData";
+import { Product } from "@/lib/api";
 
 interface ShopProductCardProps {
   product: Product;
@@ -9,7 +9,7 @@ interface ShopProductCardProps {
   onAddToCart: (product: Product) => void;
   isAdded: boolean;
   isWished: boolean;
-  onToggleWish: (id: number) => void;
+  onToggleWish: (id: string) => void;
 }
 
 function starsHTML(r: number) {
@@ -36,6 +36,21 @@ export default function ShopProductCard({
   onToggleWish,
 }: ShopProductCardProps) {
   const delay = (index % 6) * 0.07;
+  const ratingAvg = p.ratings?.average || 0;
+  const ratingCount = p.ratings?.count || 0;
+  const imgUrl = p.images?.[0] || '/placeholder.jpg';
+  
+  let badge = null;
+  let badgeLabel = null;
+  if (p.discount && p.discount > 0) {
+    badge = "sale";
+    badgeLabel = `-${p.discount}%`;
+  } else if (p.isFeatured) {
+    badge = "hot";
+    badgeLabel = "Hot";
+  }
+
+  const oldPrice = p.discount ? Math.round(p.price / (1 - p.discount / 100)) : null;
 
   return (
     <div
@@ -44,15 +59,15 @@ export default function ShopProductCard({
     >
       <div className="sp-card__img">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={p.img} alt={p.name} loading="lazy" />
-        {p.badge && (
-          <span className={`sp-badge ${badgeClass(p.badge)}`}>
-            {p.badgeLabel}
+        <img src={imgUrl} alt={p.name} loading="lazy" />
+        {badge && (
+          <span className={`sp-badge ${badgeClass(badge)}`}>
+            {badgeLabel}
           </span>
         )}
         <button
           className="sp-wishlist-btn"
-          onClick={() => onToggleWish(p.id)}
+          onClick={() => onToggleWish(p._id)}
           aria-label={isWished ? "Remove from wishlist" : "Add to wishlist"}
         >
           {isWished ? "❤️" : "🤍"}
@@ -64,26 +79,21 @@ export default function ShopProductCard({
         <div className="sp-card__name">{p.name}</div>
 
         <div className="sp-card__tags">
-          {p.tags.map((tag) => (
+          {p.tags?.map((tag) => (
             <span key={tag} className="sp-card__tag">
               {tag}
             </span>
           ))}
-          {p.sameDay && (
-            <span className="sp-card__tag sp-card__tag--express">
-              ⚡ Same Day
-            </span>
-          )}
         </div>
 
         {viewMode === "list" && (
-          <p className="sp-card__desc">{p.desc}</p>
+          <p className="sp-card__desc">{p.description}</p>
         )}
 
         <div className="sp-card__rating">
-          <span className="sp-card__stars">{starsHTML(p.rating)}</span>
+          <span className="sp-card__stars">{starsHTML(ratingAvg)}</span>
           <span className="sp-card__reviews">
-            {p.rating} ({p.reviews})
+            {ratingAvg} ({ratingCount})
           </span>
         </div>
 
@@ -92,9 +102,9 @@ export default function ShopProductCard({
             <span className="sp-card__price">
               ₹{p.price.toLocaleString()}
             </span>
-            {p.oldPrice && (
+            {oldPrice && (
               <span className="sp-card__old-price">
-                ₹{p.oldPrice.toLocaleString()}
+                ₹{oldPrice.toLocaleString()}
               </span>
             )}
           </div>

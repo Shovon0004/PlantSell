@@ -21,7 +21,7 @@ export const productRules = [
   body('discount').optional().isFloat({ min: 0, max: 100 }).withMessage('Discount must be between 0 and 100'),
   body('isFeatured').optional().isBoolean().withMessage('isFeatured must be a boolean'),
   body('isAvailable').optional().isBoolean().withMessage('isAvailable must be a boolean'),
-  body('tags').optional().isArray().withMessage('Tags must be an array')
+  body('tags').optional().custom(value => typeof value === 'string' || Array.isArray(value)).withMessage('Tags must be a string or array')
 ];
 
 export const reviewRules = [

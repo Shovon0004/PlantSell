@@ -12,6 +12,7 @@ import User from '../models/User.js';
 // @access  Private/Admin
 export const createProduct = async (req, res, next) => {
   try {
+    console.log("createProduct req.body:", req.body);
     const { name, description, price, stock, category, type, tags, discount, isFeatured, isAvailable } = req.body;
 
     const images = [];

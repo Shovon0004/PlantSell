@@ -1,9 +1,9 @@
 "use client";
 
-import { Product } from "@/lib/shopData";
+import { Product } from "@/lib/api";
 
 export interface ShopCartItem {
-  id: number;
+  id: string;
   name: string;
   price: number;
   qty: number;
@@ -14,11 +14,11 @@ interface ShopCartSidebarProps {
   isOpen: boolean;
   items: ShopCartItem[];
   onClose: () => void;
-  onQtyChange: (id: number, delta: number) => void;
+  onQtyChange: (id: string, delta: number) => void;
 }
 
 export function productToCartItem(p: Product): ShopCartItem {
-  return { id: p.id, name: p.name, price: p.price, qty: 1, img: p.img };
+  return { id: p._id, name: p.name, price: p.price, qty: 1, img: p.images?.[0] || '/placeholder.jpg' };
 }
 
 export default function ShopCartSidebar({

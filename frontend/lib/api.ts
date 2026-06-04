@@ -148,6 +148,8 @@ export const api = {
       }),
     myOrders: () =>
       request<{ success: boolean; data: Order[] }>("/orders/my-orders"),
+    get: (id: string) =>
+      request<{ success: boolean; data: Order }>(`/orders/${id}`),
     cancel: (id: string) =>
       request(`/orders/${id}/cancel`, { method: "POST" }),
   },
@@ -167,6 +169,13 @@ export const api = {
         method: "POST",
         body: JSON.stringify(addr),
       }),
+    updateAddress: (id: string, addr: Partial<Address>) =>
+      request(`/profile/address/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(addr),
+      }),
+    deleteAddress: (id: string) =>
+      request(`/profile/address/${id}`, { method: "DELETE" }),
   },
 
   // ---- ADMIN ----
@@ -207,6 +216,8 @@ export const api = {
     // Users/Customers
     getUsers: () =>
       request<{ success: boolean; data: User[] }>("/admin/users"),
+    getUser: (id: string) =>
+      request<{ success: boolean; data: User }>(`/admin/users/${id}`),
     blockUser: (id: string, isBlocked: boolean) =>
       request(`/admin/users/${id}/block`, {
         method: "PUT",
@@ -216,11 +227,18 @@ export const api = {
       request(`/admin/users/${id}`, { method: "DELETE" }),
 
     // Categories
-    createCategory: (data: { name: string; description: string }) =>
+    createCategory: (data: { name: string; description: string; subcategories?: string[] }) =>
       request("/admin/categories", {
         method: "POST",
         body: JSON.stringify(data),
       }),
+    updateCategory: (id: string, data: Partial<Category>) =>
+      request(`/admin/categories/${id}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      }),
+    deleteCategory: (id: string) =>
+      request(`/admin/categories/${id}`, { method: "DELETE" }),
   },
 };
 
@@ -340,7 +358,7 @@ export interface TopProduct {
 }
 
 export interface RevenueData {
-  _id: string;
+  _id: string | { year: number; week?: number; month?: number; day?: number };
   revenue: number;
   orders: number;
 }
