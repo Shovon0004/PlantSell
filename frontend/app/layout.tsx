@@ -5,6 +5,11 @@ import {
   Nunito,
 } from "next/font/google";
 import "./globals.css";
+import "./store.css";
+import "./store-cart.css";
+import "./store-admin.css";
+import { AuthProvider } from "@/lib/context/AuthContext";
+import { CartProvider } from "@/lib/context/CartContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -38,7 +43,11 @@ export default function RootLayout({
       className={`${playfair.variable} ${sofadi.variable} ${nunito.variable} ${dmSans.variable}`}
     >
       <body className="font-dm-sans antialiased">
-        {children}
+        <AuthProvider>
+          <CartProvider>
+            {children}
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

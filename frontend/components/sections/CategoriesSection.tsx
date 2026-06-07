@@ -39,7 +39,7 @@ export default function CategoriesSection() {
             Shop by <em>Category</em>
           </h2>
         </div>
-        <a className="see-all" href="#">
+        <a className="see-all" href="/shop">
           View All &gt;
         </a>
       </div>

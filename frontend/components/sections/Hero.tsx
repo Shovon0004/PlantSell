@@ -20,9 +20,9 @@ export default function Hero({ onPrimaryClick, onSecondaryClick }: HeroProps) {
           doorstep with expert care guides.
         </p>
         <div className="hero-actions">
-          <button className="btn-primary" onClick={onPrimaryClick}>
+          <a href="/shop" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>
             Shop Now
-          </button>
+          </a>
           <button className="btn-outline" onClick={onSecondaryClick}>
             How It Works &gt;
           </button>

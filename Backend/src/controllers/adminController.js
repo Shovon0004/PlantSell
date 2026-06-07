@@ -12,6 +12,7 @@ import User from '../models/User.js';
 // @access  Private/Admin
 export const createProduct = async (req, res, next) => {
   try {
+    console.log("createProduct req.body:", req.body);
     const { name, description, price, stock, category, type, tags, discount, isFeatured, isAvailable } = req.body;
 
     const images = [];
@@ -19,6 +20,8 @@ export const createProduct = async (req, res, next) => {
       req.files.forEach(file => {
         images.push(`/uploads/${file.filename}`);
       });
+    } else if (req.body.imageUrl) {
+      images.push(req.body.imageUrl);
     }
 
     const tagsArray = tags ? (typeof tags === 'string' ? tags.split(',') : tags) : [];
@@ -75,6 +78,8 @@ export const updateProduct = async (req, res, next) => {
     if (req.files && req.files.length > 0) {
       const newImages = req.files.map(file => `/uploads/${file.filename}`);
       updates.images = [...(product.images || []), ...newImages];
+    } else if (req.body.imageUrl) {
+      updates.images = [req.body.imageUrl];
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
@@ -527,6 +532,7 @@ export const getTopProductsAnalytics = async (req, res, next) => {
           name: '$productInfo.name',
           category: '$productInfo.category',
           type: '$productInfo.type',
+          images: '$productInfo.images',
           quantitySold: 1,
           revenueGenerated: { $round: ['$revenueGenerated', 2] }
         }
